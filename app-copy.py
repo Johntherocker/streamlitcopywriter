@@ -1,21 +1,63 @@
 import os
 import streamlit as st
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain.docstore.document import Document
 from langchain.embeddings import OpenAIEmbeddings
 import google.generativeai as genai
+import tiktoken
 
-# Set your API keys
-os.environ["OPENAI_API_KEY"] = ${{ secrets.OPENAI_API_KEY }}
-os.environ["GOOGLE_API_KEY"] = ${{ secrets.GOOGLE_API_KEY }}
+import requests
+from pathlib import Path
 
+def download_file(url, local_path):
+    if not local_path.exists():
+        r = requests.get(url)
+        r.raise_for_status()
+        with open(local_path, "wb") as f:
+            f.write(r.content)
+
+def download_faiss_index():
+    faiss_url = "https://www.dropbox.com/scl/fi/y5kw2ut5orxhww7a6pydp/index.faiss?rlkey=igd39gip391qvbutmil5hw3u8&st=3wdtafag&dl=1"
+    pkl_url = "https://www.dropbox.com/scl/fi/kly0btqxm9tfd02wnxzds/index.pkl?rlkey=3tg1bdyemk4wx74htbjzct21a&st=u89nmt2w&dl=1"
+
+    index_faiss_path = Path("/tmp/index.faiss")
+    index_pkl_path = Path("/tmp/index.pkl")
+
+    if not index_faiss_path.exists():
+        r = requests.get(faiss_url)
+        r.raise_for_status()
+        with open(index_faiss_path, "wb") as f:
+            f.write(r.content)
+
+    if not index_pkl_path.exists():
+        r = requests.get(pkl_url)
+        r.raise_for_status()
+        with open(index_pkl_path, "wb") as f:
+            f.write(r.content)
+
+    return index_faiss_path.parent
+
+
+openai_api_key = os.getenv("OPENAI_API_KEY")
+google_api_key = os.getenv("GOOGLE_API_KEY")
+
+os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"] 
+os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
+
+# Get current working directory in Jupyter
+current_dir = os.getcwd()
+
+faiss_folder_path = os.path.join(current_dir, "faiss_index_store")
 
 # Load vector store and embeddings
 @st.cache_resource
 def load_faiss_index():
     embeddings = OpenAIEmbeddings()
-    faiss_index = FAISS.load_local(r"c:\users\ceder\faiss_index_store", embeddings,allow_dangerous_deserialization=True)
+    faiss_folder_path = download_faiss_index()
+    faiss_index = FAISS.load_local(
+        str(faiss_folder_path), embeddings, allow_dangerous_deserialization=True
+    )
     return faiss_index
 
 faiss_index = load_faiss_index()
