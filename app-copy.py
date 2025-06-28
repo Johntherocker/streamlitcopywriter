@@ -18,8 +18,8 @@ def download_file(url, local_path):
             f.write(r.content)
 
 def download_faiss_index():
-    faiss_url = "https://www.dropbox.com/scl/fi/kly0btqxm9tfd02wnxzds/index.pkl?rlkey=3tg1bdyemk4wx74htbjzct21a&st=ug8w4ebt&dl=1"
-    pkl_url = "https://www.dropbox.com/scl/fi/ub3eva6qo8c7cht5h53c1/index2.pkl?rlkey=pe6ka420v3vul0i89vuprub59&st=144q8kbi&dl=1"
+    faiss_url = "https://www.dropbox.com/scl/fi/qremi1hgcosexm05zzcnz/index2.faiss?rlkey=kuqie18uzdg1y79m2dw9gw6ju&st=t7itidel&dl=1"
+    pkl_url = "https://www.dropbox.com/scl/fi/ub3eva6qo8c7cht5h53c1/index2.pkl?rlkey=pe6ka420v3vul0i89vuprub59&st=91hegoq0&dl=1"
 
     index_faiss_path = Path("/tmp/index2.faiss")
     index_pkl_path = Path("/tmp/index2.pkl")
