@@ -82,16 +82,57 @@ Answer:"""
     return response.text
 
 # Streamlit UI
-st.title("📘 Copywriter Advisor (RAG + Gemini)")
+#st.title("📘 Copywriter Advisor (RAG + Gemini)")
 
-query = st.text_area("Enter your copywriting question:")
+#query = st.text_area("Enter your copywriting question:")
 
-top_k = st.slider("Number of relevant documents (top_k)", 1, 20, 4)
+#top_k = st.slider("Number of relevant documents (top_k)", 1, 20, 4)
 
-if st.button("Get Advice"):
+#if st.button("Get Advice"):
+#    if query.strip():
+#        with st.spinner("Thinking..."):
+#            answer = rag_query(query, top_k)
+#            st.markdown("### 💡 Advice:")
+#            st.write(answer)
+#    else:
+#        st.warning("Please enter a question.")
+
+def rag_query_with_history(query: str, chat_history: list, top_k: int = 4):
+    similar_docs = faiss_index.similarity_search(query, k=top_k)
+    context = "\n\n".join(doc.page_content for doc in similar_docs)
+
+    # Format chat history as dialogue
+    history_text = ""
+    for i, (q, a) in enumerate(chat_history):
+        history_text += f"User: {q}\nBusiness Oracle: {a}\n"
+
+    prompt = f"""You are a business oracle with access to the best business books ever in bookall.txt. You give excellent business advice like a management consultant on steroids.
+Context: Advice for businesses.
+{context}
+
+Conversation history:
+{history_text}
+
+User: {query}
+Answer:"""
+
+    response = gemini_model.generate_content(prompt)
+    return response.text
+
+# In your Streamlit app UI code:
+
+st.title("📘 The Business Oracle (RAG + Gemini)")
+
+query = st.text_area("Enter your business question:", key="query_input")
+
+top_k = st.slider("Number of relevant documents (top_k)", 1, 20, 4, key="top_k_slider")
+
+if st.button("Get Advice", key="get_advice_button"):
     if query.strip():
         with st.spinner("Thinking..."):
-            answer = rag_query(query, top_k)
+            answer = rag_query_with_history(query, st.session_state.chat_history, top_k)
+            st.session_state.chat_history.append((query, answer))
+
             st.markdown("### 💡 Advice:")
             st.write(answer)
     else:
