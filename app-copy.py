@@ -106,8 +106,8 @@ def rag_query_with_history(query: str, chat_history: list, top_k: int = 4):
     for i, (q, a) in enumerate(chat_history):
         history_text += f"User: {q}\nBusiness Oracle: {a}\n"
 
-    prompt = f"""You are a business oracle with access to the best business books ever in bookall.txt. You give excellent business advice like a management consultant on steroids.
-Context: Advice for businesses.
+    prompt = f"""You are a great copywriter with access to the 14 best copywriting books out there in bookall.txt. You give advice based on the information and knowledge in these books.
+Context: Advice for aspiring copywriters
 {context}
 
 Conversation history:
@@ -121,9 +121,9 @@ Answer:"""
 
 # In your Streamlit app UI code:
 
-st.title("📘 The Business Oracle (RAG + Gemini)")
+st.title("📘 Copywriter Advisor (RAG + Gemini)")
 
-query = st.text_area("Enter your business question:", key="query_input")
+query = st.text_area("Enter your copywriting question:", key="query_input")
 
 top_k = st.slider("Number of relevant documents (top_k)", 1, 20, 4, key="top_k_slider")
 
