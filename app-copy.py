@@ -10,6 +10,9 @@ import tiktoken
 import requests
 from pathlib import Path
 
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
 def download_file(url, local_path):
     if not local_path.exists():
         r = requests.get(url)
